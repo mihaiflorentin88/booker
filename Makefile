@@ -38,6 +38,9 @@ docker-compile:
 	#fyne-cross darwin -arch amd64 -app-id $(APP_ID) --dependencies "go install fyne.io/fyne/v2/cmd/fyne@latest" -output booker-darwin-amd64
 	#fyne-cross darwin -arch arm64 -app-id $(APP_ID) --dependencies "go install fyne.io/fyne/v2/cmd/fyne@latest" -output booker-darwin-arm64
 
+archive:
+	tar -cvzf bin/booker-windows-amd64.tar.gz bin/booker-windows-amd64.exe
+	tar -cvzf bin/booker-windows-arm64.tar.gz bin/booker-windows-arm64.exe
 clean:
 	rm -rf $(BUILD_DIR)
 

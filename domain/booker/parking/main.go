@@ -93,7 +93,7 @@ func (p *Parking) book() {
 		p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker][Error] failed to login: %v", err))
 		return
 	}
-	for time.Now().Before(time.Now().Add(10 * time.Minute)) {
+	for time.Now().Before(time.Now().Add(5 * time.Minute)) {
 		select {
 		case <-p.ctx.Done():
 			p.updateOutput(p.outputLabel, "[Booker] Process stopped.")
@@ -106,31 +106,35 @@ func (p *Parking) book() {
 					p.updateOutput(p.outputLabel, "[Booker] Process stopped.")
 					return
 				default:
-					p.updateOutput(p.outputLabel, fmt.Sprintf(
-						"[Booker][Error] Attempting to book parking space: Days since epoch: %v, SpotID: %v, ParkingID %v",
-						daysSinceEpoch,
-						parkingSpot.SpotID,
-						parkingSpot.ParkingID),
-					)
-					payload := dto.NewBookingPayload(daysSinceEpoch, parkingSpot.SpotID, parkingSpot.ParkingID)
-					payloadBytes, err := payload.ToJson()
-					p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Payload %v", string(payloadBytes)))
-					p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Access Token: %v", p.parkingClient.GetAccessToken()))
-					err = p.parkingClient.Book(payload)
-					if err == nil {
-						p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Successfully booked parking space for SpotID: %v, ParkingID: %v",
-							parkingSpot.SpotID,
-							parkingSpot.ParkingID,
-						))
-						break
+					if p.bookFirstAvailable(daysSinceEpoch, parkingSpot) {
+						return
 					}
-					p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker][Error] failed to book. Reason: %v", err))
-					p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker]Retrying in : %v seconds", 1))
-					time.Sleep(1 * time.Second)
 				}
 			}
 			p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker]Retrying in : %v seconds", 3))
 			time.Sleep(3 * time.Second)
 		}
 	}
+}
+
+func (p *Parking) bookFirstAvailable(daysSinceEpoch int, parkingSpot config.ParkingSpot) bool {
+	p.updateOutput(p.outputLabel, fmt.Sprintf(
+		"[Booker][Error] Attempting to book parking space: Days since epoch: %v, SpotID: %v, ParkingID %v",
+		daysSinceEpoch,
+		parkingSpot.SpotID,
+		parkingSpot.ParkingID),
+	)
+	payload := dto.NewBookingPayload(daysSinceEpoch, parkingSpot.SpotID, parkingSpot.ParkingID)
+	err := p.parkingClient.Book(payload)
+	if err == nil {
+		p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Successfully booked parking space for SpotID: %v, ParkingID: %v",
+			parkingSpot.SpotID,
+			parkingSpot.ParkingID,
+		))
+		return true
+	}
+	p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker][Error] failed to book. Reason: %v", err))
+	p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker]Retrying in : %v seconds", 1))
+	time.Sleep(1 * time.Second)
+	return false
 }
