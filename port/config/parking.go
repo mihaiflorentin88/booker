@@ -28,3 +28,12 @@ type Parking struct {
 	ParkingSpot []ParkingSpot `json:"parkingSpot"`
 	Schedule    Schedule      `json:"schedule"`
 }
+
+func NewEmptyParking() Parking {
+	return Parking{
+		StandBy:     StandBy{},
+		Credentials: Credentials{},
+		Schedule:    Schedule{},
+		ParkingSpot: []ParkingSpot{},
+	}
+}

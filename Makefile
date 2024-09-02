@@ -17,14 +17,14 @@ MAC_ARM64_BINARY=$(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64
 compile:
 	@echo "Compiling for all supported platforms..."
 	# Windows
-	#GOOS=windows GOARCH=amd64 go build -o $(WINDOWS_AMD64_BINARY) $(MAIN_GO_FILE)
-	#GOOS=windows GOARCH=arm64 go build -o $(WINDOWS_ARM64_BINARY)
+	#CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o $(WINDOWS_AMD64_BINARY) $(MAIN_GO_FILE)
+	#GOOS=windows GOARCH=arm64 CGO_ENABLED=1 go build -o $(WINDOWS_ARM64_BINARY)
 	# Linux
-	#GOOS=linux GOARCH=amd64 go build -o $(LINUX_AMD64_BINARY) $(MAIN_GO_FILE)
-	#GOOS=linux GOARCH=arm64 go build -o $(LINUX_ARM64_BINARY) $(MAIN_GO_FILE)
+	#GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o $(LINUX_AMD64_BINARY) $(MAIN_GO_FILE)
+	#GOOS=linux GOARCH=arm64 CGO_ENABLED=1 go build -o $(LINUX_ARM64_BINARY) $(MAIN_GO_FILE)
 	# macOS
-	#GOOS=darwin GOARCH=arm64 go build -o $(MAC_ARM64_BINARY) $(MAIN_GO_FILE)
-	GOOS=darwin GOARCH=amd64 go build -o $(MAC_AMD64_BINARY) $(MAIN_GO_FILE)
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $(MAC_ARM64_BINARY) $(MAIN_GO_FILE)
+	#GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $(MAC_AMD64_BINARY) $(MAIN_GO_FILE)
 
 # Docker-based cross-compilation for all OS versions
 docker-compile:

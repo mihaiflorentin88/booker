@@ -105,12 +105,11 @@ func MoveWithContext(ctx context.Context, startTime, endTime string, outputLabel
 				updateOutput(outputLabel, "[MouseMover] End time reached. Stopping mouse movement.")
 				return
 			}
+			//
+			//x := rand.Intn(screenWidth)
+			//y := rand.Intn(screenHeight)
 
-			x := rand.Intn(screenWidth)
-			y := rand.Intn(screenHeight)
-
-			robotgo.MoveSmooth(x, y, 5.0, 15.0)
-			updateOutput(outputLabel, fmt.Sprintf("[MouseMover] Mouse moved to: %d, %d", x, y))
+			robotgo.MoveSmooth(rand.Intn(200), rand.Intn(200), 5.0, 15.0)
 		}
 	}
 }

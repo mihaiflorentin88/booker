@@ -6,10 +6,8 @@ import (
 	"booking/port/contract"
 	"booking/port/dto"
 	"context"
-	"errors"
 	"fmt"
 	"fyne.io/fyne/v2/widget"
-	"strings"
 	"sync"
 	"time"
 )
@@ -24,7 +22,7 @@ type Parking struct {
 
 func NewParkingBooker(cfg *config.Config, parkingClient contract.ParkingClientInterface, ctx context.Context, widget *widget.Label, updateOutput contract.UpdateOutputFunc) *Parking {
 	return &Parking{
-		config:        cfg.Parking,
+		config:        &cfg.Parking,
 		ctx:           ctx,
 		outputLabel:   widget,
 		updateOutput:  updateOutput,
@@ -32,10 +30,8 @@ func NewParkingBooker(cfg *config.Config, parkingClient contract.ParkingClientIn
 	}
 }
 
-func (p *Parking) Start() error {
-	var errs []string
+func (p *Parking) Start() {
 	var wg sync.WaitGroup
-	errChan := make(chan error)
 	if p.config.StandBy.CanStandby {
 		wg.Add(1)
 		go func() {
@@ -49,14 +45,6 @@ func (p *Parking) Start() error {
 		p.book()
 	}()
 	wg.Wait()
-	close(errChan)
-	for err := range errChan {
-		errs = append(errs, err.Error())
-	}
-	if len(errs) > 0 {
-		return errors.New(strings.Join(errs, "; "))
-	}
-	return nil
 }
 
 func (p *Parking) book() {
@@ -74,7 +62,7 @@ func (p *Parking) book() {
 	p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Current time: %v", now))
 	p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Start time: %v (Zone: %v)", start, start.Location()))
 	p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Days since epoch: %v", daysSinceEpoch))
-	p.updateOutput(p.outputLabel, "[Booker] Logging user to booking app.")
+	p.updateOutput(p.outputLabel, "[Booker] Logging user to booking App.")
 	if now.Before(start) {
 		p.updateOutput(p.outputLabel, fmt.Sprintf("[Booker] Waiting for start time. Starting in %v seconds", time.Until(start).Seconds()))
 		select {
