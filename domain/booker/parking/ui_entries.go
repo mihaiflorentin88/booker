@@ -185,8 +185,8 @@ func (ui *UIEntries) parkingTab() *fyne.Container {
 		ui.ParkingSpotScrollContainer,
 	)
 	buttons := container.NewHBox(ui.AddParkingSlotBtn, ui.RunBtn)
-	scroll := container.NewVScroll(c)
-	scroll.SetMinSize(fyne.NewSize(600, 500))
-	layout := container.NewBorder(nil, buttons, nil, nil, scroll)
+	scrollableContent := container.NewVScroll(c)
+	scrollableContent.SetMinSize(fyne.NewSize(600, 600))
+	layout := container.NewBorder(nil, buttons, nil, nil, scrollableContent)
 	return layout
 }

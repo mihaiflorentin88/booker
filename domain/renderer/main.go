@@ -19,7 +19,6 @@ type Renderer struct {
 	Window          fyne.Window
 	ParkingBooker   *parking.Renderer
 	Tabs            *container.AppTabs
-	Content         *fyne.Container
 	ButtonContainer *fyne.Container
 }
 
@@ -38,13 +37,9 @@ func (r *Renderer) Render() {
 	r.Tabs = container.NewAppTabs(
 		r.ParkingBooker.UI.Tab,
 	)
-	r.Content = container.NewVBox(
-		r.Tabs,
-	)
-
-	layout := container.NewBorder(container.NewHBox(r.fileMenu()), nil, nil, nil, r.Content)
+	layout := container.NewBorder(container.NewHBox(r.fileMenu()), nil, nil, nil, r.Tabs)
 	r.Window.SetContent(layout)
-	r.Window.Resize(fyne.NewSize(600, 600))
+	r.Window.Resize(fyne.NewSize(600, 700))
 	r.Window.ShowAndRun()
 }
 
