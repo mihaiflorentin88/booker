@@ -18,7 +18,7 @@ compile:
 	@echo "Compiling for all supported platforms..."
 	# Windows
 	#CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -o $(WINDOWS_AMD64_BINARY) $(MAIN_GO_FILE)
-	#GOOS=windows GOARCH=arm64 CGO_ENABLED=1 go build -o $(WINDOWS_ARM64_BINARY)
+	#CC=aarch64-w64-mingw32-gcc CXX=aarch64-w64-mingw32-g++ GOOS=windows GOARCH=arm64 CGO_ENABLED=1 go build -o $(WINDOWS_ARM64_BINARY)  $(MAIN_GO_FILE)
 	# Linux
 	#GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o $(LINUX_AMD64_BINARY) $(MAIN_GO_FILE)
 	#GOOS=linux GOARCH=arm64 CGO_ENABLED=1 go build -o $(LINUX_ARM64_BINARY) $(MAIN_GO_FILE)
@@ -41,6 +41,7 @@ docker-compile:
 archive:
 	tar -cvzf bin/booker-windows-amd64.tar.gz bin/booker-windows-amd64.exe
 	tar -cvzf bin/booker-windows-arm64.tar.gz bin/booker-windows-arm64.exe
+	tar -cvzf bin/booker-darwin-arm64.tar.gz bin/booker-darwin-arm64
 clean:
 	rm -rf $(BUILD_DIR)
 

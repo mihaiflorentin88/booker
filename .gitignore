@@ -68,3 +68,4 @@ database.db.bkp
 
 config/*.toml
 kc-credentials.json
+fyne-cross
