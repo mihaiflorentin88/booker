@@ -27,7 +27,7 @@ type UIEntries struct {
 	ParkingSpotContainer        *fyne.Container
 	ParkingSpotScrollContainer  *container.Scroll
 	AddParkingSlotBtn           *widget.Button
-	RunBtn                      *widget.Button
+	ExecuteBtn                  *widget.Button
 	Tab                         *container.TabItem
 	RunnerOutputWindow          fyne.Window
 	RunnerOutputLabel           *widget.Label
@@ -57,18 +57,13 @@ func NewUIEntries(config *config.Config, parkingClient contract.ParkingClientInt
 	ui.StandByEndTimePicker = component.CreateCustomDatePicker()
 	ui.BookStartTimePicker = component.CreateCustomDatePicker()
 	ui.ParkingSpotScrollContainer = container.NewVScroll(ui.ParkingSpotContainer)
-	ui.ParkingSpotScrollContainer.SetMinSize(fyne.NewSize(600, 200))
+	ui.ParkingSpotScrollContainer.SetMinSize(fyne.NewSize(600, 500))
 	ui.AddParkingSlotBtn = ui.getParkingSpotBtn()
 	ui.RunnerOutputLabel.Wrapping = fyne.TextWrapWord
 	ui.RunnerOutputScrollContainer = container.NewVScroll(ui.RunnerOutputLabel)
 	ui.RunnerOutputScrollContainer.SetMinSize(fyne.NewSize(700, 300))
-	ui.RunBtn = ui.getRunBtn()
+	ui.ExecuteBtn = ui.getExecuteBtn()
 	ui.Tab = container.NewTabItem("Parking", ui.parkingTab())
-
-	//for _, spot := range cfg.Parking.ParkingSpot {
-	//	UI.ParkingSpotContainer.Add(createParkingSpotEntry(&spot))
-	//	UI.ParkingSpotContainer.Add(widget.NewSeparator())
-	//}
 	return ui
 }
 
@@ -161,32 +156,71 @@ func (ui *UIEntries) createParkingSpotEntry(spot *config.ParkingSpot) *fyne.Cont
 		spotIDContainer,
 	)
 }
-
-func (ui *UIEntries) parkingTab() *fyne.Container {
-	c := container.NewVBox(
+func (ui *UIEntries) credentialsContent() *fyne.Container {
+	return container.NewVBox(
 		widget.NewLabel("Credentials"),
 		widget.NewForm(
 			widget.NewFormItem("Username", ui.UsernameEntry),
 			widget.NewFormItem("Password", ui.PasswordEntry),
 			widget.NewFormItem("Google API Key", ui.GoogleAPIKeyEntry),
 		),
+	)
+}
+
+func (ui *UIEntries) standbyContent() *fyne.Container {
+	return container.NewVBox(
 		widget.NewLabel("Standby Prevention"),
 		widget.NewForm(
 			widget.NewFormItem("Prevent OS Standby", ui.StandByCheckbox),
 			widget.NewFormItem("Start Time", ui.StandByStartTimePicker),
 			widget.NewFormItem("End Time", ui.StandByEndTimePicker),
 		),
+	)
+}
+
+func (ui *UIEntries) scheduleContent() *fyne.Container {
+	return container.NewVBox(
 		widget.NewLabel("Schedule"),
 		widget.NewForm(
 			widget.NewFormItem("Date", ui.BookStartTimePicker),
 			widget.NewFormItem("Offset", ui.OffsetEntry),
 		),
+	)
+}
+
+func (ui *UIEntries) parkingSpotsContent() *fyne.Container {
+	content := container.NewVBox(
 		widget.NewLabel("Parking Spots"),
 		ui.ParkingSpotScrollContainer,
+		//	ui.AddParkingSlotBtn,
 	)
-	buttons := container.NewHBox(ui.AddParkingSlotBtn, ui.RunBtn)
-	scrollableContent := container.NewVScroll(c)
-	scrollableContent.SetMinSize(fyne.NewSize(600, 600))
-	layout := container.NewBorder(nil, buttons, nil, nil, scrollableContent)
+	return container.NewBorder(nil, ui.AddParkingSlotBtn, nil, nil, content)
+}
+
+func (ui *UIEntries) parkingTab() *fyne.Container {
+	content := container.NewMax()
+	content.Add(ui.credentialsContent())
+	navbar := container.NewVBox(
+		widget.NewButton("Credentials", func() {
+			content.Objects = []fyne.CanvasObject{ui.credentialsContent()}
+			content.Refresh()
+		}),
+		widget.NewButton("Standby Prevention", func() {
+			content.Objects = []fyne.CanvasObject{ui.standbyContent()}
+			content.Refresh()
+		}),
+		widget.NewButton("Schedule", func() {
+			content.Objects = []fyne.CanvasObject{ui.scheduleContent()}
+			content.Refresh()
+		}),
+		widget.NewButton("Parking Spots", func() {
+			content.Objects = []fyne.CanvasObject{ui.parkingSpotsContent()}
+			content.Refresh()
+		}),
+	)
+	//buttons := container.NewHBox(ui.ExecuteBtn)
+	//layout := container.NewBorder(nil, buttons, navbar, nil, content)
+	buttons := container.NewBorder(nil, nil, nil, nil, ui.ExecuteBtn)
+	layout := container.NewBorder(nil, buttons, navbar, nil, content)
 	return layout
 }

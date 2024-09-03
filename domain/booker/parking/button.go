@@ -20,8 +20,8 @@ func (ui *UIEntries) getParkingSpotBtn() *widget.Button {
 	})
 }
 
-func (ui *UIEntries) getRunBtn() *widget.Button {
-	return widget.NewButton("Run", func() {
+func (ui *UIEntries) getExecuteBtn() *widget.Button {
+	return widget.NewButton("Execute", func() {
 		ui.UpdateConfig()
 		isValid, missingFields := ui.Config.IsValid()
 		if !isValid {
